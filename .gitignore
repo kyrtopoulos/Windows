@@ -1,0 +1,32 @@
+# Ignore Windows / PowerShell temp and junk files
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Logs
+*.log
+
+# PowerShell history
+*.pshistory
+
+# VSCode / IDE settings (if you ever use them)
+.vscode/
+.idea/
+
+# Backup / temp files
+*.bak
+*.tmp
+*.swp
+*~
+
+# Node/npm cache if ever used
+node_modules/
+npm-debug.log*
+
+# Python virtual envs (in case you try Python someday)
+__pycache__/
+*.pyc
+.venv/
