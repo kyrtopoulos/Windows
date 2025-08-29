@@ -69,7 +69,7 @@ Edit `ntfy-Windows-Notifications-Config.json` with your specific values:
     "BasePath": "C:\\ntfy-Windows-Notifications",
     "LocalServer": "http://192.168.1.100:8080",
     "RemoteServer": "https://ntfy.sh",
-    "Topic": "your-unique-topic-name",
+    "Topic": "MyWindowsNotifications",
     "MaxRetries": 3,
     "RetryIntervalMinutes": 5,
     "NetworkTimeoutSeconds": {
