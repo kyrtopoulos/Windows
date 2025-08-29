@@ -1,6 +1,6 @@
 # ntfy Windows Notifications - Task Scheduler Services Setup
 # Run this script as Administrator to create all three scheduled tasks
-# Requires: ntfy-Windows-Notifications-Config.json in the same directory
+# Requires: ntfy-Windows-Notifications-Config.json in the config directory
 
 param(
     [switch]$RemoveExisting,
@@ -18,7 +18,7 @@ $BOOT_TASK_NAME     = "ntfy Windows Boot Notification"
 $SHUTDOWN_TASK_NAME = "ntfy Windows Shutdown Notification"
 $QUEUE_TASK_NAME    = "ntfy Queue Processor Service"
 
-# Script paths (relative to this setup script)
+# Script paths (located in base directory, not setup directory)
 $BOOT_SCRIPT      = "ntfy-Windows-Boot-Notification.ps1"
 $SHUTDOWN_SCRIPT  = "ntfy-Windows-Shutdown-Notification.ps1"
 $QUEUE_SCRIPT     = "ntfy-Queue-Processor-Service.ps1"
@@ -34,18 +34,26 @@ if (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
     exit 1
 }
 
-# Verify configuration file exists
-$configPath = Join-Path $SCRIPT_DIR $CONFIG_FILE
+# Load configuration to determine base path
+$configPath = Join-Path $SCRIPT_DIR "..\config\$CONFIG_FILE"
 if (-not (Test-Path $configPath)) {
     Write-Host "ERROR: Configuration file not found: $configPath" -ForegroundColor Red
-    Write-Host "Please ensure $CONFIG_FILE is in the same directory as this script" -ForegroundColor Yellow
+    Write-Host "Please ensure $CONFIG_FILE is in the config directory" -ForegroundColor Yellow
     exit 1
 }
 
-# Verify script files exist
-$bootScriptPath     = Join-Path $SCRIPT_DIR $BOOT_SCRIPT
-$shutdownScriptPath = Join-Path $SCRIPT_DIR $SHUTDOWN_SCRIPT
-$queueScriptPath    = Join-Path $SCRIPT_DIR $QUEUE_SCRIPT
+try {
+    $config = Get-Content $configPath | ConvertFrom-Json
+    $SCRIPT_BASE_PATH = $config.BasePath
+} catch {
+    Write-Host "ERROR: Failed to parse configuration file: $($_.Exception.Message)" -ForegroundColor Red
+    exit 1
+}
+
+# Verify script files exist in base directory
+$bootScriptPath     = Join-Path $SCRIPT_BASE_PATH $BOOT_SCRIPT
+$shutdownScriptPath = Join-Path $SCRIPT_BASE_PATH $SHUTDOWN_SCRIPT
+$queueScriptPath    = Join-Path $SCRIPT_BASE_PATH $QUEUE_SCRIPT
 
 foreach ($scriptPath in @($bootScriptPath, $shutdownScriptPath, $queueScriptPath)) {
     if (-not (Test-Path $scriptPath)) {
@@ -55,7 +63,8 @@ foreach ($scriptPath in @($bootScriptPath, $shutdownScriptPath, $queueScriptPath
 }
 
 Write-Host "Configuration verified successfully" -ForegroundColor Green
-Write-Host "Script directory: $SCRIPT_DIR" -ForegroundColor Gray
+Write-Host "Configuration path: $configPath" -ForegroundColor Gray
+Write-Host "Script base path: $SCRIPT_BASE_PATH" -ForegroundColor Gray
 Write-Host ""
 
 # Functions
@@ -249,7 +258,7 @@ Write-Host "- ntfy Queue processor Service: Runs every 10 minutes to process off
 Write-Host "- All tasks run as SYSTEM account with highest privileges" -ForegroundColor Gray
 Write-Host "- AC power requirement: Disabled" -ForegroundColor Gray
 Write-Host "- Allowed to be run on demand" -ForegroundColor Gray
-Write-Host "- Run as soon as possibe after a scheduled start is missed" -ForegroundColor Gray
+Write-Host "- Run as soon as possible after a scheduled start is missed" -ForegroundColor Gray
 Write-Host "- Restart on failure: 3 attempts, 1-minute intervals" -ForegroundColor Gray
 Write-Host "- Execution time limit: 1 hour" -ForegroundColor Gray
 Write-Host "- Can be forced to stop if the task does not end when requested" -ForegroundColor Gray
