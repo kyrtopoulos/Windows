@@ -137,6 +137,28 @@ Professional notification system for Windows boot/shutdown events with enterpris
 
 ---
 
+## Repository Structure
+
+```
+Windows/
+├── README.md                                         # This file
+├── LICENSE                                           # Apache 2.0 License
+├── SECURITY.md                                       # Security policy and vulnerability reporting
+├── Scripts/
+│   ├── ntfy-Notifications/                           # Complete notification system
+│   │   ├── ntfy-Windows-Notifications-Project.md
+│   │   └── src/                                      # Source files
+│   ├── SystemAdmin/                                  # System administration scripts
+│   ├── NetworkTools/                                 # Network utilities
+│   ├── SecurityAudit/                                # Security assessment tools
+│   └── Productivity/                                 # Productivity utilities
+├── Batch/                                            # Legacy batch files
+├── CMD/                                              # Command-line utilities
+└── Guides/                                           # Documentation and guides
+```
+
+---
+
 ## Contributing
 
 ### Guidelines
@@ -152,27 +174,6 @@ Professional notification system for Windows boot/shutdown events with enterpris
 - **Error Handling**: Implement try-catch blocks and meaningful error messages
 - **Logging**: Include verbose output for troubleshooting
 - **Security**: Follow secure coding practices
-
----
-
-## Repository Structure
-
-```
-Windows/
-├── README.md                          # This file
-├── LICENSE                            # Apache 2.0 License
-├── Scripts/
-│   ├── ntfy-Notifications/            # Complete notification system
-│   │   ├── ntfy-Windows-Notifications-Project.md
-│   │   └── src/                       # Source files
-│   ├── SystemAdmin/                   # System administration scripts
-│   ├── NetworkTools/                  # Network utilities
-│   ├── SecurityAudit/                 # Security assessment tools
-│   └── Productivity/                  # Productivity utilities
-├── Batch/                             # Legacy batch files
-├── CMD/                               # Command-line utilities
-└── Guides/                           # Documentation and guides
-```
 
 ---
 
@@ -198,32 +199,14 @@ For enterprise deployments, custom automation, or consulting services:
 ## License & Legal
 
 ### Apache License 2.0
-This repository is licensed under the Apache License 2.0, which allows:
-- **Commercial Use**: Use in commercial environments
-- **Modification**: Adapt scripts for specific needs
-- **Distribution**: Share with others freely
-- **Patent Grant**: Protection from patent lawsuits
-
+This repository is licensed under the Apache License 2.0.
 See [LICENSE](./LICENSE) file for complete terms.
 
 ### Disclaimer
-These scripts are provided "as-is" without warranty. Always test in non-production environments before deployment. The author is not responsible for any system issues resulting from script usage.
+These tools are provided "as-is" for educational and professional use without warranty.
+Always test in non-production environments before deployment.
+The author is not responsible for any system issues resulting from script usage.
 
----
-
-## Changelog & Updates
-
-### Latest Updates
-- **ntfy Notifications System**: Complete enterprise notification solution
-- **Enhanced Documentation**: Comprehensive guides and examples
-- **Security Improvements**: Updated credential handling and encryption
-- **Windows 11 Compatibility**: Tested and verified on latest Windows versions
-
-### Planned Features
-- PowerShell 7 compatibility updates
-- Additional system monitoring tools
-- Cloud integration utilities
-- Enhanced automation frameworks
 ---
 
 *Professional Windows automation solutions by [Dimitris Kyrtopoulos](https://kyrtopoulos.com)*
