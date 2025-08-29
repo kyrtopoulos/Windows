@@ -1,0 +1,16 @@
+{
+    "BasePath": "C:\\#Scripts\\ntfy-Notifications",
+    "LocalServer": "http://192.168.1.10",
+    "RemoteServer": "https://ntfy.example.com",
+    "Topic": "MyTopic",
+    "MaxRetries": 3,
+    "RetryIntervalMinutes": 5,
+    "NetworkTimeoutSeconds": {
+        "ServerTest": 5,
+        "Boot": 15,
+        "Shutdown": 8,
+        "QueueProcessor": 15
+    },
+    "LoggingEnabled": true,
+    "QueueProcessorInterval": 10
+}
