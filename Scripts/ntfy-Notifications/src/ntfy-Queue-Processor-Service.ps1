@@ -11,7 +11,7 @@ param(
 # CENTRALIZED CONFIGURATION - UPDATE CONFIG FILE TO CHANGE ALL SETTINGS
 # =============================================================================
 try {
-    $configPath = Join-Path $PSScriptRoot "ntfy-Windows-Notifications-Config.json"
+    $configPath = Join-Path $PSScriptRoot "..\config\ntfy-Windows-Notifications-Config.json"
     if (-not (Test-Path $configPath)) {
         throw "Configuration file not found: $configPath"
     }
@@ -37,12 +37,12 @@ catch {
 }
 # =============================================================================
 
-# Centralized file paths - all derived from $SCRIPT_BASE_PATH
-$queuePath = Join-Path $SCRIPT_BASE_PATH "ntfy-Windows-Notification-Queue.json"
-$logPath = Join-Path $SCRIPT_BASE_PATH "ntfy-Queue-Processor-Service.log"
-$SecurePasswordPath = Join-Path $SCRIPT_BASE_PATH "ntfy-Password.enc"
-$SecureUserPath = Join-Path $SCRIPT_BASE_PATH "ntfy-User.enc"
-$KeyPath = Join-Path $SCRIPT_BASE_PATH "ntfy.key"
+# Centralized file paths - all derived from $SCRIPT_BASE_PATH with new structure
+$queuePath = Join-Path $SCRIPT_BASE_PATH "queue\ntfy-Windows-Notification-Queue.json"
+$logPath = Join-Path $SCRIPT_BASE_PATH "logs\ntfy-Queue-Processor-Service.log"
+$SecurePasswordPath = Join-Path $SCRIPT_BASE_PATH "credentials\ntfy-Password.enc"
+$SecureUserPath = Join-Path $SCRIPT_BASE_PATH "credentials\ntfy-User.enc"
+$KeyPath = Join-Path $SCRIPT_BASE_PATH "credentials\ntfy.key"
 
 # Function to decrypt credentials
 function Get-DecryptedCredentials {
@@ -176,6 +176,8 @@ ntfy Windows Notification Details:
 - Event Type: $($notification.Type)
 
 Note: This ntfy Windows Notification was queued due to network connectivity issues and is now being delivered with the original timestamp preserved.
+
+ntfy Windows Notification sent via ntfy server $ServerUrl
 "@
             
             $success = Send-NtfyNotification -ServerUrl $ServerUrl -Title $notification.Title -Message $modifiedMessage -Credentials $Credentials -Priority $notification.Priority -Tags "$($notification.Tags),queued"
@@ -211,6 +213,8 @@ Queue Statistics:
 - Queue Clear Time: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')
 
 All offline ntfy Windows Notifications have been successfully delivered with their original timestamps preserved.
+
+ntfy Windows Notification sent via ntfy server $ServerUrl
 "@
                 Send-NtfyNotification -ServerUrl $ServerUrl -Title "Offline ntfy Windows Notifications Delivered" -Message $summaryMessage -Credentials $Credentials -Priority 4 -Tags "windows,queued,summary,success,loudspeaker"
             }
