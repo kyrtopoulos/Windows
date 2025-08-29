@@ -1,8 +1,8 @@
 {
-    "BasePath": "C:\\#Scripts\\ntfy-Notifications",
-    "LocalServer": "http://192.168.1.10",
-    "RemoteServer": "https://ntfy.example.com",
-    "Topic": "MyTopic",
+    "BasePath": "C:\\ntfy-Windows-Notifications",
+    "LocalServer": "http://192.168.1.100:8080",
+    "RemoteServer": "https://ntfy.sh",
+    "Topic": "your-unique-topic-name",
     "MaxRetries": 3,
     "RetryIntervalMinutes": 5,
     "NetworkTimeoutSeconds": {
