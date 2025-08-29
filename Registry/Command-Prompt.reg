@@ -1,0 +1,7 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Folder\shell\Command_Prompt]
+@="cmd"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Folder\shell\Command_Prompt\command]
+@="cmd.exe \"%1\""
