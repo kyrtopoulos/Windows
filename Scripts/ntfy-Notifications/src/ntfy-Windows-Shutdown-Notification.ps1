@@ -5,7 +5,20 @@
 # CENTRALIZED CONFIGURATION - UPDATE CONFIG FILE TO CHANGE ALL SETTINGS
 # =============================================================================
 try {
-    $configPath = Join-Path $PSScriptRoot "ntfy-Windows-Notifications-Config.json"
+    # Get the actual script directory regardless of execution context
+    $actualScriptDir = $null
+    
+    # Try multiple methods to find the real script location
+    if ($MyInvocation.MyCommand.Path) {
+        $actualScriptDir = Split-Path $MyInvocation.MyCommand.Path -Parent
+    } elseif ($PSCommandPath) {
+        $actualScriptDir = Split-Path $PSCommandPath -Parent
+    } else {
+        $actualScriptDir = $PSScriptRoot
+    }
+    
+    $configPath = Join-Path $actualScriptDir "config\ntfy-Windows-Notifications-Config.json"
+    
     if (-not (Test-Path $configPath)) {
         throw "Configuration file not found: $configPath"
     }
@@ -27,12 +40,12 @@ catch {
 # System variables
 $computerName = $env:COMPUTERNAME
 
-# Centralized file paths - all derived from $SCRIPT_BASE_PATH
-$logPath = Join-Path $SCRIPT_BASE_PATH "ntfy-Windows-Shutdown-Notifications.log"
-$queuePath = Join-Path $SCRIPT_BASE_PATH "ntfy-Windows-Notification-Queue.json"
-$SecurePasswordPath = Join-Path $SCRIPT_BASE_PATH "ntfy-Password.enc"
-$SecureUserPath = Join-Path $SCRIPT_BASE_PATH "ntfy-User.enc"
-$KeyPath = Join-Path $SCRIPT_BASE_PATH "ntfy.key"
+# Centralized file paths - all derived from $SCRIPT_BASE_PATH with new structure
+$logPath = Join-Path $SCRIPT_BASE_PATH "logs\ntfy-Windows-Shutdown-Notifications.log"
+$queuePath = Join-Path $SCRIPT_BASE_PATH "queue\ntfy-Windows-Notification-Queue.json"
+$SecurePasswordPath = Join-Path $SCRIPT_BASE_PATH "credentials\ntfy-Password.enc"
+$SecureUserPath = Join-Path $SCRIPT_BASE_PATH "credentials\ntfy-User.enc"
+$KeyPath = Join-Path $SCRIPT_BASE_PATH "credentials\ntfy.key"
 
 # Function to decrypt credentials
 function Get-DecryptedCredentials {
