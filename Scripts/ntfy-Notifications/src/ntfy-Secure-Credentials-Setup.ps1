@@ -1,4 +1,4 @@
-# Enhanced Secure Credential Setup for ntfy Windows Notifications
+# Secure Credentials Setup for ntfy Windows Notifications
 # Encrypts both username and password for maximum security
 # Run this once as Administrator to securely store ntfy credentials
 
