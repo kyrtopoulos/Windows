@@ -1,6 +1,6 @@
 # ntfy Queue Processor Service - Task Scheduler Service Setup
-# Run this script as Administrator to create all three scheduled tasks
-# Requires: ntfy-Windows-Notifications-Config.json in the same directory
+# Run this script as Administrator to create the queue processor scheduled task
+# Requires: ntfy-Windows-Notifications-Config.json in the config directory
 
 param(
     [switch]$RemoveExisting,
@@ -16,7 +16,7 @@ $CONFIG_FILE  = "ntfy-Windows-Notifications-Config.json"
 # Task name
 $QUEUE_TASK_NAME    = "ntfy Queue Processor Service"
 
-# Script path (relative to this setup script)
+# Script path (relative to this setup script, but located in queue directory)
 $QUEUE_SCRIPT     = "ntfy-Queue-Processor-Service.ps1"
 
 Write-Host "ntfy Queue Processor Service - Service Setup" -ForegroundColor Cyan
@@ -30,16 +30,24 @@ if (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
     exit 1
 }
 
-# Verify configuration file exists
-$configPath = Join-Path $SCRIPT_DIR $CONFIG_FILE
+# Load configuration to determine base path
+$configPath = Join-Path $SCRIPT_DIR "..\config\$CONFIG_FILE"
 if (-not (Test-Path $configPath)) {
     Write-Host "ERROR: Configuration file not found: $configPath" -ForegroundColor Red
-    Write-Host "Please ensure $CONFIG_FILE is in the same directory as this script" -ForegroundColor Yellow
+    Write-Host "Please ensure $CONFIG_FILE is in the config directory" -ForegroundColor Yellow
     exit 1
 }
 
-# Verify script file exist
-$queueScriptPath    = Join-Path $SCRIPT_DIR $QUEUE_SCRIPT
+try {
+    $config = Get-Content $configPath | ConvertFrom-Json
+    $SCRIPT_BASE_PATH = $config.BasePath
+} catch {
+    Write-Host "ERROR: Failed to parse configuration file: $($_.Exception.Message)" -ForegroundColor Red
+    exit 1
+}
+
+# Verify script file exists in queue directory
+$queueScriptPath = Join-Path $SCRIPT_BASE_PATH "queue\$QUEUE_SCRIPT"
 
 if (-not (Test-Path $queueScriptPath)) {
      Write-Host "ERROR: Script file not found: $queueScriptPath" -ForegroundColor Red
@@ -47,7 +55,9 @@ if (-not (Test-Path $queueScriptPath)) {
 }
 
 Write-Host "Configuration verified successfully" -ForegroundColor Green
-Write-Host "Script directory: $SCRIPT_DIR" -ForegroundColor Gray
+Write-Host "Configuration path: $configPath" -ForegroundColor Gray
+Write-Host "Script base path: $SCRIPT_BASE_PATH" -ForegroundColor Gray
+Write-Host "Queue script path: $queueScriptPath" -ForegroundColor Gray
 Write-Host ""
 
 # Functions
@@ -94,7 +104,7 @@ if ($RemoveExisting) { Remove-ExistingTasks; Write-Host "Task removal completed"
 # Remove existing tasks before creating new ones
 Remove-ExistingTasks
 
-Write-Host "Creating scheduled tasks..." -ForegroundColor Yellow
+Write-Host "Creating scheduled task..." -ForegroundColor Yellow
 Write-Host ""
 
 # =============================================================================
@@ -128,13 +138,13 @@ Write-Host "- ntfy Queue processor Service: Runs every 10 minutes to process off
 Write-Host "- Task run as SYSTEM account with highest privileges" -ForegroundColor Gray
 Write-Host "- AC power requirement: Disabled" -ForegroundColor Gray
 Write-Host "- Allowed to be run on demand" -ForegroundColor Gray
-Write-Host "- Run as soon as possibe after a scheduled start is missed" -ForegroundColor Gray
+Write-Host "- Run as soon as possible after a scheduled start is missed" -ForegroundColor Gray
 Write-Host "- Restart on failure: 3 attempts, 1-minute intervals" -ForegroundColor Gray
 Write-Host "- Execution time limit: 1 hour" -ForegroundColor Gray
 Write-Host "- Can be forced to stop if the task does not end when requested" -ForegroundColor Gray
 Write-Host ""
 Write-Host "Usage Examples:" -ForegroundColor Yellow
-Write-Host "  Remove all tasks: .\ntfy-Queue-Processor-Service-Setup-Service.ps1 -RemoveExisting" -ForegroundColor Gray
+Write-Host "  Remove task: .\ntfy-Queue-Processor-Service-Setup-Service.ps1 -RemoveExisting" -ForegroundColor Gray
 Write-Host "  List task status: .\ntfy-Queue-Processor-Service-Setup-Service.ps1 -ListTasks" -ForegroundColor Gray
 Write-Host ""
 Write-Host "Next step:" -ForegroundColor Yellow
