@@ -13,7 +13,7 @@ param(
 # CENTRALIZED CONFIGURATION - UPDATE CONFIG FILE TO CHANGE ALL SETTINGS
 # =============================================================================
 try {
-    $configPath = Join-Path $PSScriptRoot "ntfy-Windows-Notifications-Config.json"
+    $configPath = Join-Path $PSScriptRoot "..\config\ntfy-Windows-Notifications-Config.json"
     if (-not (Test-Path $configPath)) {
         throw "Configuration file not found: $configPath"
     }
@@ -28,22 +28,30 @@ catch {
 }
 # =============================================================================
 
-# Centralized file paths - all derived from $SCRIPT_BASE_PATH
-$SecurePasswordPath = Join-Path $SCRIPT_BASE_PATH "ntfy-Password.enc"
-$SecureUserPath = Join-Path $SCRIPT_BASE_PATH "ntfy-User.enc"
-$KeyPath = Join-Path $SCRIPT_BASE_PATH "ntfy.key"
+# Centralized file paths - all derived from $SCRIPT_BASE_PATH with new structure
+$credentialsPath = Join-Path $SCRIPT_BASE_PATH "credentials"
+$SecurePasswordPath = Join-Path $credentialsPath "ntfy-Password.enc"
+$SecureUserPath = Join-Path $credentialsPath "ntfy-User.enc"
+$KeyPath = Join-Path $credentialsPath "ntfy.key"
 
 Write-Host "Enhanced ntfy Credential Setup" -ForegroundColor Cyan
 Write-Host "==============================" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "Using configuration file: $configPath" -ForegroundColor Gray
 Write-Host "Using base path: $SCRIPT_BASE_PATH" -ForegroundColor Gray
+Write-Host "Using credentials path: $credentialsPath" -ForegroundColor Gray
 Write-Host ""
 
-# Create directory if it doesn't exist
+# Create base directory if it doesn't exist
 if (-not (Test-Path $SCRIPT_BASE_PATH)) {
     New-Item -ItemType Directory -Path $SCRIPT_BASE_PATH -Force | Out-Null
-    Write-Host "Created directory: $SCRIPT_BASE_PATH" -ForegroundColor Green
+    Write-Host "Created base directory: $SCRIPT_BASE_PATH" -ForegroundColor Green
+}
+
+# Create credentials directory if it doesn't exist
+if (-not (Test-Path $credentialsPath)) {
+    New-Item -ItemType Directory -Path $credentialsPath -Force | Out-Null
+    Write-Host "Created credentials directory: $credentialsPath" -ForegroundColor Green
 }
 
 try {
@@ -180,10 +188,11 @@ try {
     Write-Host "  - Files hidden from normal view" -ForegroundColor Gray
     Write-Host "  - Access restricted to SYSTEM and Administrators only" -ForegroundColor Gray
     Write-Host "  - Credentials stored separately for enhanced security" -ForegroundColor Gray
+    Write-Host "  - Organized folder structure" -ForegroundColor Gray
     Write-Host ""
     Write-Host "Next steps:" -ForegroundColor Cyan
-    Write-Host "  1. Copy the ntfy Windows Notifications scripts to the same directory" -ForegroundColor Gray
-    Write-Host "  2. Set up Task Scheduler tasks to run the scripts" -ForegroundColor Gray
+    Write-Host "  1. Copy the ntfy Windows Notifications scripts to the base directory" -ForegroundColor Gray
+    Write-Host "  2. Set up Task Scheduler tasks using the setup scripts" -ForegroundColor Gray
     Write-Host "  3. Test both boot and shutdown ntfy Windows Notifications" -ForegroundColor Gray
     
     # Test decryption to ensure it works
@@ -214,8 +223,10 @@ try {
     $TestPlainUser = $null
     
     Write-Host ""
-    Write-Host "All files are stored in: $SCRIPT_BASE_PATH" -ForegroundColor Cyan
-    Write-Host "To change paths in future, update the configuration file: ntfy-Windows-Notifications-Config.json" -ForegroundColor Yellow
+    Write-Host "All files are stored in organized structure:" -ForegroundColor Cyan
+    Write-Host "  Base Path: $SCRIPT_BASE_PATH" -ForegroundColor Gray
+    Write-Host "  Credentials: $credentialsPath" -ForegroundColor Gray
+    Write-Host "To change paths in future, update the configuration file: config\ntfy-Windows-Notifications-Config.json" -ForegroundColor Yellow
     
 } catch {
     Write-Host ""
