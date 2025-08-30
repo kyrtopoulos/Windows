@@ -23,7 +23,6 @@ The ntfy Windows Notifications System is a comprehensive PowerShell-based soluti
 - **Centralized Configuration**: Single JSON configuration file controls all system settings
 - **Organized File Structure**: Professional directory hierarchy for easy maintenance
 - **Comprehensive Logging**: Detailed logging with timestamp preservation
-- **Flexible Deployment**: Support for both Task Scheduler and Group Policy implementations
 
 ### System Architecture
 
@@ -152,11 +151,7 @@ cd "[BasePath]\setup"
 
 ---
 
-## Deployment Options
-
-Choose one of two deployment methods based on your environment and preferences:
-
-## Option 1: Task Scheduler (Automated Setup)
+## Deployment: Task Scheduler (Automated Setup)
 
 **Recommended for**: Standard users, automated deployment, consistent scheduling
 
@@ -183,52 +178,6 @@ This creates three scheduled tasks:
 - **Reliability**: 3 retry attempts with 1-minute intervals
 - **Timeout**: 1-hour execution limit
 - **Availability**: Can run on-demand and after missed schedules
-
-## Option 2: Group Policy (Recommended)
-
-**Recommended for**: Enterprise environments, domain-managed systems, direct OS integration
-
-### Manual Group Policy Configuration
-
-1. **Open Group Policy Editor**:
-   ```cmd
-   gpedit.msc
-   ```
-
-2. **Navigate to Script Configuration**:
-   ```
-   Computer Configuration → Windows Settings → Scripts (Startup/Shutdown)
-   ```
-
-3. **Configure Startup Script**:
-   - Select **Startup** → **PowerShell Scripts**
-   - Click **Add**
-   - **Script Name**: `[BasePath]\ntfy-Windows-Boot-Notification.ps1`
-   - **Script Parameters**: (leave blank)
-
-4. **Configure Shutdown Script**:
-   - Select **Shutdown** → **PowerShell Scripts**
-   - Click **Add**
-   - **Script Name**: `[BasePath]\ntfy-Windows-Shutdown-Notification.ps1`
-   - **Script Parameters**: (leave blank)
-
-5. **Set Up Queue Processor (Task Scheduler)**:
-   ```powershell
-   cd "[BasePath]\setup"
-   .\ntfy-Queue-Processor-Service-Setup-Service.ps1
-   ```
-
-6. **Apply Group Policy Changes**:
-   ```cmd
-   gpupdate /force
-   ```
-
-### Group Policy Advantages
-
-- **OS-Level Integration**: Direct integration with Windows startup/shutdown process
-- **Domain Management**: Centralized deployment across enterprise environments
-- **Reliability**: Native Windows service integration
-- **Performance**: Minimal overhead compared to scheduled tasks
 
 ---
 
