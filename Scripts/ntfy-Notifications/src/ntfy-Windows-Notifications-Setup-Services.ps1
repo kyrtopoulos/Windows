@@ -53,7 +53,7 @@ try {
 # Verify script files exist in base directory
 $bootScriptPath     = Join-Path $SCRIPT_BASE_PATH $BOOT_SCRIPT
 $shutdownScriptPath = Join-Path $SCRIPT_BASE_PATH $SHUTDOWN_SCRIPT
-$queueScriptPath    = Join-Path $SCRIPT_BASE_PATH $QUEUE_SCRIPT
+$queueScriptPath = Join-Path $SCRIPT_BASE_PATH "queue\$QUEUE_SCRIPT"
 
 foreach ($scriptPath in @($bootScriptPath, $shutdownScriptPath, $queueScriptPath)) {
     if (-not (Test-Path $scriptPath)) {
