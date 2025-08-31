@@ -13,8 +13,8 @@ Professional collection of Windows automation scripts, system administration too
 
 ## Repository Contents
 
-### 📂 [Scripts/ntfy-Notifications](./Scripts/ntfy-Notifications/)
-**Enterprise-grade Windows Boot/Shutdown Notification System**
+### 📂 [Scripts/ntfy-notifications](./Scripts/ntfy-notifications/)
+**Enterprise-grade Windows Startup/Shutdown Notification System**
 - Real-time notifications via ntfy servers
 - Offline queue management with timestamp preservation
 - Encrypted credential storage with AES-256
@@ -76,14 +76,18 @@ Documentation and best practices:
 
 ## Featured Projects
 
-### ntfy Windows Notifications System
-Professional notification system for Windows boot/shutdown events with enterprise features:
-- **Reliability**: Offline queue management ensures no missed notifications
-- **Security**: Military-grade AES-256 credential encryption
-- **Flexibility**: Multiple deployment options (Task Scheduler/Group Policy)
-- **Monitoring**: Comprehensive logging and error handling
+### ntfy Windows Notifications Project
+Enterprise-grade notification system for Windows startup/shutdown events with comprehensive monitoring:
 
-[📖 Complete Documentation](./Scripts/ntfy-Notifications/ntfy-Windows-Notifications-Project.md)
+- **Dual-Server Failover**: Automatic failover between local and remote ntfy servers
+- **Offline Queue Management**: Stores notifications when servers unavailable, delivers when connectivity restored
+- **Advanced Logging**: Separate log files with automatic rotation for different components
+- **Startup Type Detection**: Distinguishes between Fast Startup (hibernation) and cold startup
+- **Multiple Deployment Options**: Group Policy (recommended) and Task Scheduler methods
+- **Enterprise Security**: SYSTEM-level execution with restricted file permissions
+- **Centralized Configuration**: Single INI file for all system settings
+
+[📖 Complete Documentation](./Scripts/ntfy-notifications/ntfy-Windows-Notifications-Project.md)
 
 ---
 
@@ -145,9 +149,7 @@ Windows/
 ├── LICENSE                                           # Apache 2.0 License
 ├── SECURITY.md                                       # Security policy and vulnerability reporting
 ├── Scripts/
-│   ├── ntfy-Notifications/                           # Complete notification system
-│   │   ├── ntfy-Windows-Notifications-Project.md
-│   │   └── src/                                      # Source files
+│   ├── ntfy-notifications/                           # Complete notification system
 │   ├── SystemAdmin/                                  # System administration scripts
 │   ├── NetworkTools/                                 # Network utilities
 │   ├── SecurityAudit/                                # Security assessment tools
