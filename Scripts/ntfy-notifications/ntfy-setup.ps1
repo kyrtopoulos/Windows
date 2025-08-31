@@ -576,7 +576,9 @@ function Show-CompletionInfo {
     }
     
     Write-Host "Ready to Use:" -ForegroundColor Yellow
-    Write-Host "1. Test the system: cd $InstallPath && .\test-ntfy-system.ps1 -TestAll" -ForegroundColor Gray
+    Write-Host "1. Test the system:" -ForegroundColor Gray
+    Write-Host "   cd $InstallPath" -ForegroundColor Gray
+    Write-Host "   .\test-ntfy-system.ps1 -TestAll" -ForegroundColor Gray
     Write-Host "2. Read documentation: Open ntfy-Windows-Notifications-Project.md with your preferred editor" -ForegroundColor Gray
     Write-Host "3. Restart the computer to activate startup notifications" -ForegroundColor Gray
     Write-Host "4. All files are now located in: $InstallPath" -ForegroundColor Gray
