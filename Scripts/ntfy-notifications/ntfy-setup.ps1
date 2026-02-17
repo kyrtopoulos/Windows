@@ -318,7 +318,9 @@ function Create-TaskSchedulerTasks {
             
             # Create Shutdown Task (using Event Trigger for better reliability)
             $shutdownAction = New-ScheduledTaskAction -Execute "cmd.exe" -Argument "/c `"$InstallPath\ntfy-shutdown-wrapper.cmd`""
+            
 
+            
             # Create Shutdown Task (using Event Trigger for shutdown detection)
             try {
                 # Method 1: Try to create event-based shutdown trigger using CIM
