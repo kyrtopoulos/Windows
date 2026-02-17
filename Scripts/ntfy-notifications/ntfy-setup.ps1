@@ -1,4 +1,4 @@
-# ntfy Windows Notifications - Interactive Setup Script
+﻿# ntfy Windows Notifications - Interactive Setup Script
 # Enhanced setup with user prompts and deployment options
 
 param(
@@ -319,7 +319,53 @@ function Create-TaskSchedulerTasks {
             # Create Shutdown Task (using Event Trigger for better reliability)
             $shutdownAction = New-ScheduledTaskAction -Execute "cmd.exe" -Argument "/c `"$InstallPath\ntfy-shutdown-wrapper.cmd`""
             
-
+            # Create XML for event-based shutdown trigger
+            $shutdownTaskXml = @"
+<?xml version="1.0" encoding="UTF-16"?>
+<Task version="1.2" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
+  <RegistrationInfo>
+    <Description>Sends ntfy windows shutdown notification with offline queue support and centralized configuration</Description>
+  </RegistrationInfo>
+  <Triggers>
+    <EventTrigger>
+      <Enabled>true</Enabled>
+      <Subscription>&lt;QueryList&gt;&lt;Query Id="0" Path="System"&gt;&lt;Select Path="System"&gt;*[System[Provider[@Name='User32'] and EventID=1074]]&lt;/Select&gt;&lt;/Query&gt;&lt;/QueryList&gt;</Subscription>
+    </EventTrigger>
+  </Triggers>
+  <Principals>
+    <Principal id="Author">
+      <UserId>NT AUTHORITY\SYSTEM</UserId>
+      <LogonType>ServiceAccount</LogonType>
+      <RunLevel>HighestAvailable</RunLevel>
+    </Principal>
+  </Principals>
+  <Settings>
+    <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>
+    <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>
+    <StopIfGoingOnBatteries>false</StopIfGoingOnBatteries>
+    <AllowHardTerminate>true</AllowHardTerminate>
+    <StartWhenAvailable>true</StartWhenAvailable>
+    <RunOnlyIfNetworkAvailable>false</RunOnlyIfNetworkAvailable>
+    <IdleSettings>
+      <StopOnIdleEnd>true</StopOnIdleEnd>
+      <RestartOnIdle>false</RestartOnIdle>
+    </IdleSettings>
+    <AllowStartOnDemand>true</AllowStartOnDemand>
+    <Enabled>true</Enabled>
+    <Hidden>false</Hidden>
+    <RunOnlyIfIdle>false</RunOnlyIfIdle>
+    <WakeToRun>false</WakeToRun>
+    <ExecutionTimeLimit>PT1H</ExecutionTimeLimit>
+    <Priority>7</Priority>
+  </Settings>
+  <Actions Context="Author">
+    <Exec>
+      <Command>cmd.exe</Command>
+      <Arguments>/c "$InstallPath\ntfy-shutdown-wrapper.cmd"</Arguments>
+    </Exec>
+  </Actions>
+</Task>
+"@
             
             # Create Shutdown Task (using Event Trigger for shutdown detection)
             try {
