@@ -120,7 +120,7 @@ The system provides an interactive setup script that guides you through configur
 
 1. **Download the setup script**:
    ```powershell
-   Invoke-WebRequest -Uri "https://raw.githubusercontent.com/kyrtopoulos/Windows/main/Scripts/ntfy-notifications/ntfy-setup.ps1" -OutFile "ntfy-setup.ps1"
+   C:\Windows\System32\curl.exe -L "https://raw.githubusercontent.com/kyrtopoulos/Windows/main/Scripts/ntfy-notifications/ntfy-setup.ps1" -o "ntfy-setup.ps1"
    ```
 
 2. **Run the interactive setup**:
