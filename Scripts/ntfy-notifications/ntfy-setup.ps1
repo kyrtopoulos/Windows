@@ -12,8 +12,8 @@ Write-Host ""
 
 # Check admin rights
 if (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-    Write-Host "ERROR: This script must be run as Administrator" -ForegroundColor Red
-    Write-Host "Please right-click PowerShell and select 'Run as Administrator'" -ForegroundColor Yellow
+    Write-Host "[ERROR] This script must be run as Administrator" -ForegroundColor Red
+    Write-Host "[WARNING] Please right-click PowerShell and select 'Run as Administrator'" -ForegroundColor Yellow
     pause
     exit 1
 }
@@ -31,7 +31,7 @@ function Remove-ExistingInstallation {
     
     # Check if installation directory exists
     if (Test-Path $Path) {
-        Write-Host "Found existing installation at: $Path" -ForegroundColor Yellow
+        Write-Host "[WARNING] Found existing installation at: $Path" -ForegroundColor Yellow
         $found = $true
     }
     
@@ -76,21 +76,21 @@ function Remove-ExistingInstallation {
             Write-Host ""
             $remove = Read-Host "Remove existing installation? (Y/n)"
             if ($remove -eq 'n' -or $remove -eq 'N') {
-                Write-Host "Installation cancelled by user" -ForegroundColor Yellow
+                Write-Host "[WARNING] Installation cancelled by user" -ForegroundColor Yellow
                 exit 0
             }
         }
         
-        Write-Host "Removing existing installation..." -ForegroundColor Yellow
+        Write-Host "[WARNING] Removing existing installation..." -ForegroundColor Yellow
         
         # Remove existing Task Scheduler tasks
         foreach ($taskName in $existingTasks) {
             try {
                 Unregister-ScheduledTask -TaskName $taskName -Confirm:$false -ErrorAction SilentlyContinue
-                Write-Host "  Removed task: $taskName" -ForegroundColor Green
+                Write-Host "[OK] Removed task: $taskName" -ForegroundColor Green
             }
             catch {
-                Write-Host "  Warning: Could not remove task $taskName : $($_.Exception.Message)" -ForegroundColor Yellow
+                Write-Host "[WARNING] Could not remove task $taskName : $($_.Exception.Message)" -ForegroundColor Yellow
             }
         }
 
@@ -105,10 +105,10 @@ function Remove-ExistingInstallation {
             if (Test-Path $regPath) {
                 try {
                     Remove-Item -Path $regPath -Recurse -Force -ErrorAction Stop
-                    Write-Host "  Removed GPO registry key: $regPath" -ForegroundColor Green
+                    Write-Host "  [OK] Removed GPO registry key: $regPath" -ForegroundColor Green
                 }
                 catch {
-                    Write-Host "  Warning: Could not remove GPO key $regPath : $($_.Exception.Message)" -ForegroundColor Yellow
+                    Write-Host "[WARNING] Could not remove GPO key $regPath : $($_.Exception.Message)" -ForegroundColor Yellow
                 }
             }
         }
@@ -118,10 +118,10 @@ function Remove-ExistingInstallation {
         if (Test-Path $scriptsIni) {
             try {
                 Remove-Item -Path $scriptsIni -Force -ErrorAction Stop
-                Write-Host "  Removed GPO scripts.ini" -ForegroundColor Green
+                Write-Host "  [OK] Removed GPO scripts.ini" -ForegroundColor Green
             }
             catch {
-                Write-Host "  Warning: Could not remove scripts.ini: $($_.Exception.Message)" -ForegroundColor Yellow
+                Write-Host "[WARNING] Could not remove scripts.ini: $($_.Exception.Message)" -ForegroundColor Yellow
             }
         }
         
@@ -129,16 +129,16 @@ function Remove-ExistingInstallation {
         if (Test-Path $Path) {
             try {
                 Remove-Item $Path -Recurse -Force -ErrorAction Stop
-                Write-Host "  Removed directory: $Path" -ForegroundColor Green
+                Write-Host "[OK] Removed directory: $Path" -ForegroundColor Green
             }
             catch {
-                Write-Host "  Warning: Could not remove directory: $($_.Exception.Message)" -ForegroundColor Yellow
+                Write-Host "[WARNING] Could not remove directory: $($_.Exception.Message)" -ForegroundColor Yellow
             }
         }
         
-        Write-Host "Cleanup completed successfully" -ForegroundColor Green
+        Write-Host "[OK] Cleanup completed successfully" -ForegroundColor Green
     } else {
-        Write-Host "No existing installation found" -ForegroundColor Green
+        Write-Host "[OK] No existing installation found" -ForegroundColor Green
     }
     Write-Host ""
 }
@@ -270,11 +270,11 @@ function Download-RequiredFiles {
             
             Write-Host "  Downloading $fileName..." -ForegroundColor Gray
             Invoke-WebRequest -Uri $url -OutFile $destination -UseBasicParsing -ErrorAction Stop
-            Write-Host "  ✓ $fileName" -ForegroundColor Green
+            Write-Host "[OK] $fileName" -ForegroundColor Green
             $downloadedFiles++
         }
         catch {
-            Write-Host "  ✗ Failed to download $fileName : $($_.Exception.Message)" -ForegroundColor Red
+            Write-Host "[ERROR] Failed to download $fileName : $($_.Exception.Message)" -ForegroundColor Red
             $failedFiles += $fileName
         }
     }
@@ -287,11 +287,11 @@ function Download-RequiredFiles {
             
             Write-Host "  Downloading $file..." -ForegroundColor Gray
             Invoke-WebRequest -Uri $url -OutFile $destination -UseBasicParsing -ErrorAction Stop
-            Write-Host "  ✓ $file" -ForegroundColor Green
+            Write-Host "[OK] $file" -ForegroundColor Green
             $downloadedFiles++
         }
         catch {
-            Write-Host "  ✗ Failed to download $file : $($_.Exception.Message)" -ForegroundColor Red
+            Write-Host "[ERROR] Failed to download $file : $($_.Exception.Message)" -ForegroundColor Red
             $failedFiles += $file
         }
     }
@@ -302,7 +302,7 @@ function Download-RequiredFiles {
     Write-Host "  Downloaded: $downloadedFiles/$totalFiles files" -ForegroundColor Gray
     
     if ($failedFiles.Count -gt 0) {
-        Write-Host "  Failed files: $($failedFiles -join ', ')" -ForegroundColor Red
+        Write-Host "  [ERROR] Failed files: $($failedFiles -join ', ')" -ForegroundColor Red
         Write-Host ""
         Write-Host "Manual download URLs:" -ForegroundColor Yellow
         foreach ($file in $systemFiles) {
@@ -376,7 +376,7 @@ function Register-GroupPolicyScripts {
             New-ItemProperty -Path $scriptKey -Name "IsPowershell" -PropertyType DWord  -Value 0 -Force | Out-Null
             New-ItemProperty -Path $scriptKey -Name "ExecTime"     -PropertyType QWord  -Value 0 -Force | Out-Null
 
-            Write-Host "  ✓ Registered $event script" -ForegroundColor Green
+            Write-Host "[OK] Registered $event script" -ForegroundColor Green
         }
     }
 
@@ -393,12 +393,12 @@ function Register-GroupPolicyScripts {
 0Parameters=
 "@
     $iniContent | Out-File -FilePath $scriptsIni -Encoding Unicode -Force
-    Write-Host "  ✓ Created scripts.ini" -ForegroundColor Green
+    Write-Host "[OK] Created scripts.ini" -ForegroundColor Green
 
     # Force GPO refresh so changes take effect immediately
     Write-Host "  Running gpupdate..." -ForegroundColor Gray
     & gpupdate /force | Out-Null
-    Write-Host "  ✓ GPO updated" -ForegroundColor Green
+    Write-Host "[OK] GPO updated" -ForegroundColor Green
 }
 
 # =============================================================================
@@ -425,7 +425,7 @@ function Create-TaskSchedulerTasks {
         $queueTrigger.Repetition = (New-ScheduledTaskTrigger -Once -At 12:00AM -RepetitionInterval (New-TimeSpan -Minutes 10) -RepetitionDuration (New-TimeSpan -Days 1)).Repetition
         
         Register-ScheduledTask -TaskName "ntfy Queue Processor" -Action $queueAction -Trigger $queueTrigger -Principal $principal -Settings $settings -Description "Processes queued ntfy windows notifications when network connectivity is restored, runs every 10 minutes with offline queue support and centralized configuration" | Out-Null
-        Write-Host "  ✓ ntfy Queue Processor" -ForegroundColor Green
+        Write-Host "[OK] ntfy Queue Processor" -ForegroundColor Green
         $tasksCreated++
         
         if ($DeploymentType -eq "TaskScheduler") {
@@ -434,7 +434,7 @@ function Create-TaskSchedulerTasks {
             $startupTrigger = New-ScheduledTaskTrigger -AtStartup
             
             Register-ScheduledTask -TaskName "ntfy Startup Notification" -Action $startupAction -Trigger $startupTrigger -Principal $principal -Settings $settings -Description "Sends ntfy windows startup notification with offline queue support and centralized configuration" | Out-Null
-            Write-Host "  ✓ ntfy Startup Notification" -ForegroundColor Green
+            Write-Host "[OK] ntfy Startup Notification" -ForegroundColor Green
             $tasksCreated++
             
             # Create Shutdown Task (using Event Trigger for better reliability)
@@ -462,17 +462,17 @@ function Create-TaskSchedulerTasks {
                     
                     $folder.RegisterTaskDefinition("ntfy Shutdown Notification", $definition, 6, "SYSTEM", $null, 5) | Out-Null
                     
-                    Write-Host "  ✓ ntfy Shutdown Notification (Event ID 1074 trigger)" -ForegroundColor Green
+                    Write-Host "[OK] ntfy Shutdown Notification (Event ID 1074 trigger)" -ForegroundColor Green
                     $tasksCreated++
                 }
                 catch {
-                    Write-Host "  ! ntfy Shutdown Notification (Basic task - manual GPO recommended for shutdown)" -ForegroundColor Yellow
-                    Write-Host "    Note: For reliable shutdown notifications, use Group Policy scripts" -ForegroundColor Gray
+                    Write-Host "[WARNING] ntfy Shutdown Notification (Basic task - manual GPO recommended for shutdown)" -ForegroundColor Yellow
+                    Write-Host "  Note: For reliable shutdown notifications, use Group Policy scripts" -ForegroundColor Gray
                     $tasksCreated++
                 }
             }
             catch {
-                Write-Host "  ! Error creating shutdown task: $($_.Exception.Message)" -ForegroundColor Red
+                Write-Host "[ERROR] creating shutdown task: $($_.Exception.Message)" -ForegroundColor Red
             }
         }
         elseif ($DeploymentType -eq "GroupPolicy") {
@@ -480,11 +480,11 @@ function Create-TaskSchedulerTasks {
             Register-GroupPolicyScripts -InstallPath $InstallPath
         }
         
-        Write-Host "Successfully created $tasksCreated task(s)" -ForegroundColor Green
+        Write-Host "[OK] Successfully created $tasksCreated task(s)" -ForegroundColor Green
         return $true
     }
     catch {
-        Write-Host "Error creating tasks: $($_.Exception.Message)" -ForegroundColor Red
+        Write-Host "[ERROR] creating tasks: $($_.Exception.Message)" -ForegroundColor Red
         return $false
     }
 }
@@ -540,11 +540,11 @@ QueueFile=ntfy-notification-queue.json
     $configPath = Join-Path $InstallPath "ntfy-notifications-config.ini"
     try {
         $configContent | Out-File -FilePath $configPath -Encoding UTF8
-        Write-Host "Configuration created: $configPath" -ForegroundColor Green
+        Write-Host "[OK] Configuration created: $configPath" -ForegroundColor Green
         return $true
     }
     catch {
-        Write-Host "Error creating configuration: $($_.Exception.Message)" -ForegroundColor Red
+        Write-Host "[ERROR] creating configuration: $($_.Exception.Message)" -ForegroundColor Red
         return $false
     }
 }
@@ -568,11 +568,11 @@ function Set-DirectoryPermissions {
         $acl.SetAccessRule($adminRule)
         Set-Acl -Path $InstallPath -AclObject $acl
         
-        Write-Host "Permissions set successfully" -ForegroundColor Green
+        Write-Host "[OK] Permissions set successfully" -ForegroundColor Green
         return $true
     }
     catch {
-        Write-Host "Warning: Could not set directory permissions: $($_.Exception.Message)" -ForegroundColor Yellow
+        Write-Host "[WARNING] Could not set directory permissions: $($_.Exception.Message)" -ForegroundColor Yellow
         return $false
     }
 }
@@ -591,33 +591,33 @@ function Show-CompletionInfo {
     Write-Host ""
     
     Write-Host "Configuration Summary:" -ForegroundColor Cyan
-    Write-Host "  Install Path: $InstallPath" -ForegroundColor Gray
-    Write-Host "  Local Server: $($Config.LocalServer)" -ForegroundColor Gray
-    Write-Host "  Remote Server: $($Config.RemoteServer)" -ForegroundColor Gray
-    Write-Host "  Topic: $($Config.Topic)" -ForegroundColor Gray
-    Write-Host "  Authentication: $(if ($Config.Username) { 'Enabled' } else { 'Disabled' })" -ForegroundColor Gray
-    Write-Host "  Deployment Type: $DeploymentType" -ForegroundColor Gray
+    Write-Host "  Install Path:     $InstallPath" -ForegroundColor Gray
+    Write-Host "  Local Server:     $($Config.LocalServer)" -ForegroundColor Gray
+    Write-Host "  Remote Server:    $($Config.RemoteServer)" -ForegroundColor Gray
+    Write-Host "  Topic:            $($Config.Topic)" -ForegroundColor Gray
+    Write-Host "  Authentication:   $(if ($Config.Username) { 'Enabled' } else { 'Disabled' })" -ForegroundColor Gray
+    Write-Host "  Deployment Type:  $DeploymentType" -ForegroundColor Gray
     Write-Host ""
     
     Write-Host "Downloaded Files:" -ForegroundColor Cyan
     Write-Host "  Successfully downloaded: $($DownloadResult.Downloaded)/$($DownloadResult.Total) files" -ForegroundColor $(if ($DownloadResult.Failed -eq 0) { "Green" } else { "Yellow" })
     if ($DownloadResult.Failed -gt 0) {
-        Write-Host "  Warning: $($DownloadResult.Failed) files failed to download" -ForegroundColor Red
+        Write-Host "  [ERROR] $($DownloadResult.Failed) files failed to download" -ForegroundColor Red
     }
     Write-Host ""
     
     Write-Host "Log Files:" -ForegroundColor Cyan
-    Write-Host "  Startup: $InstallPath\ntfy-startup-notifications.log" -ForegroundColor Gray
+    Write-Host "  Startup:  $InstallPath\ntfy-startup-notifications.log" -ForegroundColor Gray
     Write-Host "  Shutdown: $InstallPath\ntfy-shutdown-notifications.log" -ForegroundColor Gray
-    Write-Host "  Queue: $InstallPath\ntfy-queue-processor.log" -ForegroundColor Gray
-    Write-Host "  Wrapper: $InstallPath\ntfy-wrapper.log" -ForegroundColor Gray
+    Write-Host "  Queue:    $InstallPath\ntfy-queue-processor.log" -ForegroundColor Gray
+    Write-Host "  Wrapper:  $InstallPath\ntfy-wrapper.log" -ForegroundColor Gray
     Write-Host ""
     
     if ($DeploymentType -eq "GroupPolicy") {
         Write-Host "Group Policy Information:" -ForegroundColor Cyan
-        Write-Host "  ✓ Startup script registered in Local Group Policy" -ForegroundColor Gray
-        Write-Host "  ✓ Shutdown script registered in Local Group Policy" -ForegroundColor Gray
-        Write-Host "  ✓ Queue processing runs automatically every 10 minutes" -ForegroundColor Gray
+        Write-Host "[OK] Startup script registered in Local Group Policy" -ForegroundColor Green
+        Write-Host "[OK] Shutdown script registered in Local Group Policy" -ForegroundColor Green
+        Write-Host "[OK] Queue processing runs automatically every 10 minutes" -ForegroundColor Green
         Write-Host ""
         Write-Host "All notifications are fully automated!" -ForegroundColor Green
         Write-Host ""
@@ -625,26 +625,26 @@ function Show-CompletionInfo {
         Write-Host "  Computer Configuration -> Windows Settings -> Scripts (Startup/Shutdown)" -ForegroundColor Gray
     } else {
         Write-Host "Task Scheduler Information:" -ForegroundColor Cyan
-        Write-Host "  ✓ ntfy Startup Notification - Runs at system startup" -ForegroundColor Gray
-        Write-Host "  ✓ ntfy Shutdown Notification - Runs on shutdown events" -ForegroundColor Gray
-        Write-Host "  ✓ ntfy Queue Processor - Runs every 10 minutes" -ForegroundColor Gray
+        Write-Host "[OK] ntfy Startup Notification  - Runs at system startup" -ForegroundColor Green
+        Write-Host "[OK] ntfy Shutdown Notification - Runs on shutdown events" -ForegroundColor Green
+        Write-Host "[OK] ntfy Queue Processor       - Runs every 10 minutes" -ForegroundColor Green
         Write-Host ""
         Write-Host "All notifications are fully automated!" -ForegroundColor Green
     }
     
     Write-Host ""
     Write-Host "Ready to Use:" -ForegroundColor Yellow
-    Write-Host "1. Test the system:" -ForegroundColor Gray
-    Write-Host "   cd $InstallPath" -ForegroundColor Gray
-    Write-Host "   .\test-ntfy-system.ps1 -TestAll" -ForegroundColor Gray
-    Write-Host "2. Read documentation: Open ntfy-Windows-Notifications-Project.md with your preferred editor" -ForegroundColor Gray
-    Write-Host "3. Restart the computer to activate startup/shutdown notifications" -ForegroundColor Gray
-    Write-Host "4. All files are now located in: $InstallPath" -ForegroundColor Gray
+    Write-Host "  1. Test the system:" -ForegroundColor Gray
+    Write-Host "     cd $InstallPath" -ForegroundColor Gray
+    Write-Host "     .\test-ntfy-system.ps1 -TestAll" -ForegroundColor Gray
+    Write-Host "  2. Read documentation: Open ntfy-Windows-Notifications-Project.md with your preferred editor" -ForegroundColor Gray
+    Write-Host "  3. Restart the computer to activate startup/shutdown notifications" -ForegroundColor Gray
+    Write-Host "  4. All files are now located in: $InstallPath" -ForegroundColor Gray
     Write-Host ""
     Write-Host "Documentation:" -ForegroundColor Cyan
     Write-Host "  Complete guide: $InstallPath\ntfy-Windows-Notifications-Project.md" -ForegroundColor Gray
     Write-Host ""
-    Write-Host "Setup completed successfully! No further action required." -ForegroundColor Green
+    Write-Host "[OK] Setup completed successfully! No further action required." -ForegroundColor Green
 }
 
 # =============================================================================
@@ -675,17 +675,17 @@ function Main {
     if (-not (Test-Path $InstallPath)) {
         try {
             New-Item -ItemType Directory -Path $InstallPath -Force | Out-Null
-            Write-Host "Created directory: $InstallPath" -ForegroundColor Green
+            Write-Host "[OK] Created directory: $InstallPath" -ForegroundColor Green
         }
         catch {
-            Write-Host "Error creating directory: $($_.Exception.Message)" -ForegroundColor Red
+            Write-Host "[ERROR] creating directory: $($_.Exception.Message)" -ForegroundColor Red
             exit 1
         }
     }
     
     # Create configuration file
     if (-not (Create-ConfigurationFile -InstallPath $InstallPath -Config $config)) {
-        Write-Host "Setup failed during configuration creation" -ForegroundColor Red
+        Write-Host "[ERROR] Setup failed during configuration creation" -ForegroundColor Red
         exit 1
     }
     
@@ -697,7 +697,7 @@ function Main {
     
     # Create Task Scheduler tasks and/or register GPO scripts
     if (-not (Create-TaskSchedulerTasks -InstallPath $InstallPath -DeploymentType $config.DeploymentType)) {
-        Write-Host "Warning: Some tasks may not have been created properly" -ForegroundColor Yellow
+        Write-Host "[WARNING] Some tasks may not have been created properly" -ForegroundColor Yellow
     }
     
     # Show completion information
@@ -708,13 +708,13 @@ function Main {
         try {
             $setupDestination = Join-Path $InstallPath "ntfy-setup.ps1"
             Move-Item $downloadResult.SetupScriptPath $setupDestination -Force -ErrorAction Stop
-            Write-Host "Setup script moved to: $setupDestination" -ForegroundColor Green
+            Write-Host "[OK] Setup script moved to: $setupDestination" -ForegroundColor Green
         }
         catch {
-            Write-Host "Warning: Could not move setup script to installation directory: $($_.Exception.Message)" -ForegroundColor Yellow
+            Write-Host "[WARNING] Could not move setup script to installation directory: $($_.Exception.Message)" -ForegroundColor Yellow
         }
     } else {
-        Write-Host "Note: Setup script path could not be determined, manually copy ntfy-setup.ps1 to $InstallPath if needed" -ForegroundColor Gray
+        Write-Host "[NOTE] Setup script path could not be determined, manually copy ntfy-setup.ps1 to $InstallPath if needed" -ForegroundColor Gray
     }
 }
 
